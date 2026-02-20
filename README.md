@@ -1,1 +1,1 @@
-# UTB.Minute
+# Semestrální projekt - Systém objednávání minutek
