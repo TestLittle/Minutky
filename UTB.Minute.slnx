@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="UTB.Minute.AppHost/UTB.Minute.AppHost.csproj" />
+  <Project Path="UTB.Minute.Db/UTB.Minute.Db.csproj" Id="ded51df1-afc5-4b4d-8084-26d2e9b45ec1" />
+  <Project Path="UTB.Minute.DbManager/UTB.Minute.DbManager.csproj" />
+  <Project Path="UTB.Minute.ServiceDefaults/UTB.Minute.ServiceDefaults.csproj" />
+</Solution>
