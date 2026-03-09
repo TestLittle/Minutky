@@ -1,4 +1,6 @@
-﻿//using UTB.Minute.Contracts;
+﻿using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.EntityFrameworkCore;
+using UTB.Minute.Contracts;
 using UTB.Minute.Db;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,20 +25,20 @@ app.Run();
 
 public static class WebApiVersion1
 {
-    public static async Task<Created<AuthorDto>> CreateMinuteMeal(AuthorDto authorDto, MinuteContext context)
+    public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealDto minuteMealDto, MinuteContext context)
     {
         // 🚀 1. Přidání nového autora do databáze.
 
-        MinuteMeal a = new() { Desc = authorDto.Desc };
+        MinuteMeal a = new() { Desc = minuteMealDto.Desc , Price = minuteMealDto.Price};
         context.MinuteMeals.Add(a);
         await context.SaveChangesAsync();
 
-        AuthorDto aDto = new AuthorDto(a.Id, a.Desc);
+        MinuteMealDto aDto = new MinuteMealDto(a.Id, a.Desc, a.Price);
 
-        return TypedResults.Created($"/authors/{aDto.Id}", aDto);
+        return TypedResults.Created($"/minuteMeals/{aDto.Id}", aDto);
     }
 
-    public static async Task<Ok<AuthorDto[]>> GetMinuteMeals(MinuteContext context)
+    public static async Task<Ok<MinuteMealDto[]>> GetMinuteMeals(MinuteContext context)
     {
         // 🚀 2.Vrácení všech autorů z databáze.
         //2.1 Načíst autory z databáze
@@ -46,9 +48,9 @@ public static class WebApiVersion1
 
         //AuthorDto[] authors = new AuthorDto[poleAutoru.Length];
 
-        AuthorDto[] authors = await context.MinuteMeals.Where(a => a.Desc.ToLower().Contains("am"))
+        MinuteMealDto[] minuteMeals = await context.MinuteMeals.Where(a => a.Desc.ToLower().Contains("am"))
                                                    .OrderBy(a => a.Desc)
-                                                   .Select(a => new AuthorDto(a.Id, a.Name))
+                                                   .Select(a => new MinuteMealDto(a.Id, a.Desc, a.Price))
                                                    .ToArrayAsync();
 
 
@@ -58,18 +60,18 @@ public static class WebApiVersion1
         //}
 
 
-        return TypedResults.Ok(authors);
+        return TypedResults.Ok(minuteMeals);
     }
 
-    public static async Task<Results<NotFound, Ok<AuthorDto>>> GetMinuteMealById(int id,  MinuteContext context)
+    public static async Task<Results<NotFound, Ok<MinuteMealDto>>> GetMinuteMealById(int id,  MinuteContext context)
     {
         // 📖 3. Vrácení jednoho autora podle id (už je implementováno, jen ho zkontrolujte).
 
-        if (await context.Authors.FindAsync(id) is Author author)
+        if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
-            AuthorDto authorDto = new(author.Id, author.Name);
+            MinuteMealDto minuteMealDto = new(minuteMeal.Id, minuteMeal.Desc, minuteMeal.Price);
 
-            return TypedResults.Ok(authorDto);
+            return TypedResults.Ok(minuteMealDto);
         }
         else
         {
@@ -77,13 +79,13 @@ public static class WebApiVersion1
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> UpdateMinuteMeal(int id, AuthorDto authorDto, MinuteContext context)
+    public static async Task<Results<NoContent, NotFound>> UpdateMinuteMeal(int id, MinuteMealDto minuteMealDto, MinuteContext context)
     {
-        if (await context.Authors.FindAsync(id) is Author author)
+        if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
             // 🚀 4. Změna autora v databázi.
 
-            author.Name = authorDto.Name;
+            minuteMeal.Desc = minuteMealDto.Desc;
 
             await context.SaveChangesAsync();
 
@@ -97,11 +99,11 @@ public static class WebApiVersion1
 
     public static async Task<Results<NoContent, NotFound>> DeleteMinuteMeal(int id, MinuteContext context)
     {
-        if (await context.Authors.FindAsync(id) is Author author)
+        if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
             // 🚀 5. Odstranění autora z databáze.
 
-            context.Authors.Remove(author);
+            context.MinuteMeals.Remove(minuteMeal);
 
             await context.SaveChangesAsync();
 
