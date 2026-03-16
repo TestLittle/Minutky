@@ -27,37 +27,37 @@ public static class WebApiVersion1
 {
     public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealDto minuteMealDto, MinuteContext context)
     {
-        // 🚀 1. Přidání nového autora do databáze.
+        // Add new meal to db
 
-        MinuteMeal a = new() { Desc = minuteMealDto.Desc , Price = minuteMealDto.Price};
-        context.MinuteMeals.Add(a);
+        MinuteMeal m = new() { Desc = minuteMealDto.Desc , Price = minuteMealDto.Price};
+        context.MinuteMeals.Add(m);
         await context.SaveChangesAsync();
 
-        MinuteMealDto aDto = new MinuteMealDto(a.Id, a.Desc, a.Price);
+        MinuteMealDto mDto = new MinuteMealDto(m.Id, m.Desc, m.Price);
 
-        return TypedResults.Created($"/minuteMeals/{aDto.Id}", aDto);
+        return TypedResults.Created($"/minuteMeals/{mDto.MinuteMealId}", mDto);
     }
 
     public static async Task<Ok<MinuteMealDto[]>> GetMinuteMeals(MinuteContext context)
     {
-        // 🚀 2.Vrácení všech autorů z databáze.
+        // Return all meals from db
         //2.1 Načíst autory z databáze
         //2.2 Převést je na typ AuthorDto
 
-        MinuteMeal[] poleAutoru = await context.MinuteMeals.ToArrayAsync();
+        MinuteMeal[] mealArr = await context.MinuteMeals.ToArrayAsync();
 
         //AuthorDto[] authors = new AuthorDto[poleAutoru.Length];
 
-        MinuteMealDto[] minuteMeals = await context.MinuteMeals.Where(a => a.Desc.ToLower().Contains("am"))
-                                                   .OrderBy(a => a.Desc)
-                                                   .Select(a => new MinuteMealDto(a.Id, a.Desc, a.Price))
+        MinuteMealDto[] minuteMeals = await context.MinuteMeals.Where(m => m.Desc.ToLower().Contains("Smazak"))
+                                                   .OrderBy(m => m.Desc)
+                                                   .Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price))
                                                    .ToArrayAsync();
 
 
-        //for (int i = 0; i < poleAutoru.Length; i++)
-        //{
-        //    authors[i] = new AuthorDto(poleAutoru[i].Id, poleAutoru[i].Name);
-        //}
+        for (int i = 0; i < mealArr.Length; i++)
+        {
+            minuteMeals[i] = new MinuteMealDto(mealArr[i].Id, mealArr[i].Desc, mealArr[i].Price);
+        }
 
 
         return TypedResults.Ok(minuteMeals);
@@ -65,7 +65,7 @@ public static class WebApiVersion1
 
     public static async Task<Results<NotFound, Ok<MinuteMealDto>>> GetMinuteMealById(int id,  MinuteContext context)
     {
-        // 📖 3. Vrácení jednoho autora podle id (už je implementováno, jen ho zkontrolujte).
+        // Return meal by id
 
         if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
@@ -83,7 +83,7 @@ public static class WebApiVersion1
     {
         if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
-            // 🚀 4. Změna autora v databázi.
+            // Change meal in db
 
             minuteMeal.Desc = minuteMealDto.Desc;
 
@@ -101,7 +101,7 @@ public static class WebApiVersion1
     {
         if (await context.MinuteMeals.FindAsync(id) is MinuteMeal minuteMeal)
         {
-            // 🚀 5. Odstranění autora z databáze.
+            // Delete meal from db
 
             context.MinuteMeals.Remove(minuteMeal);
 

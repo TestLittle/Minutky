@@ -1,4 +1,4 @@
 ﻿namespace UTB.Minute.Contracts
 {
-    public record OrderDto(int Id);
+    public record OrderDto(int OrderId);
 }

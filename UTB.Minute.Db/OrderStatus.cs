@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace UTB.Minute.Db
+﻿namespace UTB.Minute.Db
 {
     public enum OrderStatus
     {

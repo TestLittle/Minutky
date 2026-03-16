@@ -1,8 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sql = builder.AddSqlServer("sql")
+var sql = builder.AddSqlServer("sql", port:55555)
                  .WithDataVolume()
-                 .WithLifetime(ContainerLifetime.Persistent);
+                 .WithLifetime(ContainerLifetime.Persistent)
+                 .WithContainerName("minutky-sql-server");
 
 var database = sql.AddDatabase("database");
 

@@ -1,4 +1,4 @@
 ﻿namespace UTB.Minute.Contracts
 {
-    public record MinuteMealDto (int Id, string Desc, double Price);
+    public record MinuteMealDto (int MinuteMealId, string Desc, double Price);
 }

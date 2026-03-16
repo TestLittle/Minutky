@@ -5,7 +5,12 @@
         public int Id { get; set; }
         public required DateTime Date { get; set; }
         public required int Portions { get; set; }
-        //minutemealsid
+
+        public int MinuteMealId { get; set; }
+        public MinuteMeal? MinuteMeal { get; set; }
+
+        public List<Order> Orders { get; set; } = [];
+        //minutemealid
         //objednávka bude mít jeden menuitem
 
     }
