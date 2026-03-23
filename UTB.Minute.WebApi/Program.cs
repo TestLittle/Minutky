@@ -15,6 +15,10 @@ app.MapDefaultEndpoints();
 
 app.MapGet("/minuteMeals", WebApiVersion1.GetAllMinuteMeals);
 app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal);
+app.MapDelete("/minuteMeals/{id}", WebApiVersion1.DeleteMinuteMeal);
+app.MapPut("/minuteMeals/{id}", WebApiVersion1.PutMinuteMeal);
+app.MapPatch("/minuteMeals/{id}", WebApiVersion1.PatchDescMinuteMeal);
+app.MapPatch("/minuteMeals/{id}", WebApiVersion1.PatchPriceMinuteMeal);
 
 app.UseHttpsRedirection();
 
@@ -39,4 +43,36 @@ public static class WebApiVersion1
         MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price);
         return TypedResults.Created($"/minuteMeals/{meal.Id}", mealDto);
     }
+
+    public static async Task<Results<NoContent, NotFound>> DeleteMinuteMeal(int id, MinuteContext context)
+    {
+        if(await context.MinuteMeals.FindAsync(id) is MinuteMeal meal)
+        {
+            context.Remove(meal);
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
+    }
+
+    public static async Task<Results<NoContent, NotFound>> PutMinuteMeal(int id, MinuteMealRequestDto request, MinuteContext context)
+    {
+
+    }
+
+
+    public static async Task<Results<NoContent, NotFound>> PatchDescMinuteMeal(int id, MinuteMealPatchDescDto patchDesc, MinuteContext context)
+    {
+
+    }
+
+    public static async Task<Results<NoContent, NotFound>> PatchPriceMinuteMeal(int id, MinuteMealPatchPriceDto patchDesc, MinuteContext context)
+    {
+
+    }
+
+
 }

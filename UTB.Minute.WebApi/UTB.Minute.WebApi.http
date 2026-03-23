@@ -13,3 +13,7 @@ Content-Type: application/json
 }
 
 ###
+
+DELETE {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4
+
+###
