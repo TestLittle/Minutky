@@ -29,9 +29,9 @@ public static class WebApiVersion1
         return TypedResults.Ok(meals);
     }
     
-    public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteContext context)
+    public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealRequestDto request, MinuteContext context)
     {
-        var meal = new MinuteMeal { Desc = };
+        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price};
 
         context.Add(meal);
         await context.SaveChangesAsync();

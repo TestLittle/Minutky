@@ -3,3 +3,13 @@
 GET {{UTB.Minute.WebApi_HostAddress}}/minuteMeals
 
 ###
+
+POST {{UTB.Minute.WebApi_HostAddress}}/minuteMeals
+Content-Type: application/json
+
+{
+  "desc": "Bolonske spagety",
+  "price": 129.99
+}
+
+###
