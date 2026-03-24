@@ -10,7 +10,6 @@ builder.AddSqlServerDbContext<MinuteContext>("database");
 var app = builder.Build();
 app.MapDefaultEndpoints();
 
-// --- MAPOVÁNÍ ---
 app.MapGet("/minuteMeals", WebApiVersion1.GetAllMinuteMeals);
 app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal);
 app.MapDelete("/minuteMeals/{id}", WebApiVersion1.DeleteMinuteMeal);
@@ -93,12 +92,12 @@ public static class WebApiVersion1
         if (item is null) return TypedResults.NotFound();
         db.MenuItems.Remove(item); await db.SaveChangesAsync(); return TypedResults.NoContent();
     }
+
     public static async Task<Results<NoContent, NotFound>> PutMenuItem(int id, MenuItemDto req, MinuteContext db)
     {
         var item = await db.MenuItems.FindAsync(id);
         if (item is null) return TypedResults.NotFound();
 
-        // Upravíme datum a porce
         item.Date = req.Date;
         item.Portions = req.Portions;
         await db.SaveChangesAsync();
@@ -119,7 +118,6 @@ public static class WebApiVersion1
         await db.SaveChangesAsync();
         return TypedResults.Created($"/orders/{order.Id}", new OrderDto(order.Id));
     }
-
 
     public static async Task<Results<NoContent, NotFound>> UpdateOrderStatus(int id, OrderStatus status, MinuteContext db)
     {
