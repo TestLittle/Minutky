@@ -15,7 +15,7 @@ app.MapDefaultEndpoints();
 
 app.MapGet("/minuteMeals", WebApiVersion1.GetAllMinuteMeals);
 app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal);
-app.MapDelete("/minuteMeals/{id}", WebApiVersion1.DeleteMinuteMeal);
+//app.MapDelete("/minuteMeals/{id}", WebApiVersion1.DeleteMinuteMeal);
 app.MapPut("/minuteMeals/{id}", WebApiVersion1.PutMinuteMeal);
 app.MapPatch("/minuteMeals/{id}", WebApiVersion1.PatchDescMinuteMeal);
 app.MapPatch("/minuteMeals/{id}", WebApiVersion1.PatchPriceMinuteMeal);
@@ -28,27 +28,27 @@ public static class WebApiVersion1
 {
     public static async Task<Ok<MinuteMealDto[]>> GetAllMinuteMeals(MinuteContext context)
     {
-        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price)).ToArrayAsync();
+        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.IsDeactivated)).ToArrayAsync();
 
         return TypedResults.Ok(meals);
     }
     
     public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealRequestDto request, MinuteContext context)
     {
-        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price};
+        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, IsDeactivated = request.IsDeactivated};
 
-        context.Add(meal);
+        context.MinuteMeals.Add(meal);
         await context.SaveChangesAsync();
 
-        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price);
+        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price, meal.IsDeactivated);
         return TypedResults.Created($"/minuteMeals/{meal.Id}", mealDto);
     }
 
-    public static async Task<Results<NoContent, NotFound>> DeleteMinuteMeal(int id, MinuteContext context)
+    public static async Task<Results<NoContent, NotFound>> DeactivateMinuteMeal(int id, MinuteContext context)
     {
         if(await context.MinuteMeals.FindAsync(id) is MinuteMeal meal)
         {
-            context.Remove(meal);
+            meal.IsDeactivated = true;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }

@@ -10,8 +10,5 @@
         public MinuteMeal? MinuteMeal { get; set; }
 
         public List<Order> Orders { get; set; } = [];
-        //minutemealid
-        //objednávka bude mít jeden menuitem
-
     }
 }

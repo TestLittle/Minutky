@@ -8,6 +8,5 @@
 
         public int MenuItemId { get; set; }
         public MenuItem? MenuItem { get; set; }
-        //menuitemid
     }
 }
