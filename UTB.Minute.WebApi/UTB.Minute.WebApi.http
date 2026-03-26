@@ -14,6 +14,26 @@ Content-Type: application/json
 
 ###
 
-DELETE {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4
+PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/desc
+Content-Type: application/json
+{
+  "desc": "Palacinky"
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/price
+Content-Type: application/json
+{
+  "price": 105.29
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/active
+Content-Type: application/json
+{
+  "isDeactivated": "true"
+}
 
 ###
