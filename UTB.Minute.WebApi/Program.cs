@@ -26,6 +26,9 @@ app.MapDelete("/menuItems/{id}", WebApiVersion1.DeleteMenuItem);
 app.MapPatch("/menuItems/{id}/date", WebApiVersion1.PatchMenuItemDate);
 app.MapPatch("/menuItems/{id}/portions", WebApiVersion1.PatchMenuItemPortions);
 app.MapPut("/menuItems/{id}", WebApiVersion1.PutMenuItem);
+app.MapPatch("/menuItems/{id}/portion", WebApiVersion1.DecreaseNumberOfPortions);
+
+app.MapGet("/orders", WebApiVersion1.GetAllOrders);
 
 
 
@@ -168,6 +171,20 @@ public static class WebApiVersion1
         }
     }
 
+    public static async Task<Results<NoContent, NotFound>> DecreaseNumberOfPortions(int id, MinuteContext context)
+    {
+        if(await context.MenuItems.FindAsync(id) is MenuItem item)
+        {
+            item.Portions = item.Portions - 1;
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
+    }
+
     public static async Task<Results<NoContent, NotFound>> PutMenuItem(int id, MenuItemRequestDto request, MinuteContext context)
     {
         if(await context.MenuItems.FindAsync(id) is MenuItem item)
@@ -181,5 +198,11 @@ public static class WebApiVersion1
         {
             return TypedResults.NotFound();
         }
+    }
+
+    public static async Task<Ok<OrderDto[]>> GetAllOrders(MinuteContext context)
+    {
+        var orders = await context.Orders.Select(o => new OrderDto(o.Id, o.OrderStatus)).ToArrayAsync();
+        return TypedResults.Ok(orders);
     }
 }
