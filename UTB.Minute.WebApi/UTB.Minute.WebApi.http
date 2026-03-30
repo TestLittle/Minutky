@@ -1,5 +1,52 @@
 @UTB.Minute.WebApi_HostAddress = https://localhost:7254
 
+
+
+GET {{UTB.Minute.WebApi_HostAddress}}/menuItems
+
+###
+
+POST {{UTB.Minute.WebApi_HostAddress}}/menuItems
+Content-Type: application/json
+
+{
+  //MenuItemRequestDto
+}
+
+###
+
+@id=0
+DELETE {{UTB.Minute.WebApi_HostAddress}}/menuItems/{{id}}
+
+###
+
+PUT {{UTB.Minute.WebApi_HostAddress}}/menuItems/{{id}}
+Content-Type: application/json
+
+{
+  //MenuItemRequestDto
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/1/date
+Content-Type: application/json
+
+{
+  "date": 
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/{{id}}/portions
+Content-Type: application/json
+
+{
+  //MenuItemPatchPortionsDto
+}
+
+###
+
 GET {{UTB.Minute.WebApi_HostAddress}}/minuteMeals
 
 ###
@@ -14,8 +61,28 @@ Content-Type: application/json
 
 ###
 
+PUT {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/2
+Content-Type: application/json
+
+{
+  "desc": "test",
+  "price": 125.89,
+  "isDeactivated": true
+}
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/active
+Content-Type: application/json
+
+{
+  "isDeactivated": true
+}
+
+###
+
 PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/desc
 Content-Type: application/json
+
 {
   "desc": "Palacinky"
 }
@@ -24,16 +91,9 @@ Content-Type: application/json
 
 PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/price
 Content-Type: application/json
+
 {
   "price": 105.29
-}
-
-###
-
-PATCH {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/4/active
-Content-Type: application/json
-{
-  "isDeactivated": "true"
 }
 
 ###
