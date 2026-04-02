@@ -5,7 +5,7 @@
         public int Id { get; set; }
         public required string Desc { get; set; }
         public required double Price { get; set; }
-        public required bool IsDeactivated { get; set; }
+        public required bool isActive { get; set; }
 
         public List<MenuItem> MenuItems { get; set; } = [];
     }

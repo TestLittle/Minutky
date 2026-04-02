@@ -15,9 +15,9 @@ app.MapPost("/reset-db", async (MinuteContext context) =>
     await context.Database.EnsureDeletedAsync();
     await context.Database.EnsureCreatedAsync();
     
-    MinuteMeal cheese = new() { Desc = "Smazeny syr s hranolkami", Price = 124.99, IsDeactivated = false};
-    MinuteMeal hamburger = new() { Desc = "Hamburger", Price = 139.99, IsDeactivated = false };
-    MinuteMeal hamPizza = new() { Desc = "Sunkova Pizza", Price = 109.99, IsDeactivated = false };
+    MinuteMeal cheese = new() { Desc = "Smazeny syr s hranolkami", Price = 124.99, isActive = false};
+    MinuteMeal hamburger = new() { Desc = "Hamburger", Price = 139.99, isActive = false };
+    MinuteMeal hamPizza = new() { Desc = "Sunkova Pizza", Price = 109.99, isActive = false };
 
     MenuItem m1 = new MenuItem { Date = new DateTime(new DateOnly(2026, 3, 17), new TimeOnly(12, 25)), Portions = 12, MinuteMeal = cheese };
     MenuItem m2 = new MenuItem { Date = new DateTime(new DateOnly(2026, 3, 17), new TimeOnly(12, 25)), Portions = 15, MinuteMeal = hamburger };

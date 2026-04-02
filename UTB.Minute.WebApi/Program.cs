@@ -27,8 +27,13 @@ app.MapPatch("/menuItems/{id}/date", WebApiVersion1.PatchMenuItemDate);
 app.MapPatch("/menuItems/{id}/portions", WebApiVersion1.PatchMenuItemPortions);
 app.MapPut("/menuItems/{id}", WebApiVersion1.PutMenuItem);
 app.MapPatch("/menuItems/{id}/portion", WebApiVersion1.DecreaseNumberOfPortions);
+app.MapPatch("/menuItems/{id}/meal", WebApiVersion1.ChangeMenuItemMeal);
 
 app.MapGet("/orders", WebApiVersion1.GetAllOrders);
+app.MapPost("/orders", WebApiVersion1.CreateOrder);
+app.MapPut("/orders/{id}", WebApiVersion1.PutOrder);
+app.MapPatch("/orders/{id}/status", WebApiVersion1.OrderChangeStatus);
+app.MapPatch("/orders/{id}/menuItem", WebApiVersion1.PatchOrderMenuItem);
 
 
 
@@ -40,27 +45,27 @@ public static class WebApiVersion1
 {
     public static async Task<Ok<MinuteMealDto[]>> GetAllMinuteMeals(MinuteContext context)
     {
-        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.IsDeactivated)).ToArrayAsync();
+        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.isActive)).ToArrayAsync();
 
         return TypedResults.Ok(meals);
     }
     
     public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealRequestDto request, MinuteContext context)
     {
-        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, IsDeactivated = request.IsDeactivated};
+        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, isActive = request.isActive};
 
         context.MinuteMeals.Add(meal);
         await context.SaveChangesAsync();
 
-        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price, meal.IsDeactivated);
+        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price, meal.isActive);
         return TypedResults.Created($"/minuteMeals/{meal.Id}", mealDto);
     }
 
-    public static async Task<Results<NoContent, NotFound>> ChangeActiveStatusMinuteMeal(int id, MinuteMealPatchIsDeactivatedDto patch, MinuteContext context)
+    public static async Task<Results<NoContent, NotFound>> ChangeActiveStatusMinuteMeal(int id, MinuteMealPatchisActiveDto patch, MinuteContext context)
     {
         if(await context.MinuteMeals.FindAsync(id) is MinuteMeal meal)
         {
-            meal.IsDeactivated = patch.IsDeactivated;
+            meal.isActive = patch.isActive;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }
@@ -76,7 +81,7 @@ public static class WebApiVersion1
         {
             meal.Desc = request.Desc;
             meal.Price = request.Price;
-            meal.IsDeactivated = request.IsDeactivated;
+            meal.isActive = request.isActive;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }
@@ -114,18 +119,17 @@ public static class WebApiVersion1
         }
     }
 
-
     public static async Task<Created<MenuItemDto>> CreateMenuItem(MenuItemRequestDto request, MinuteContext context)
     {
         MenuItem menuItem = new MenuItem() { Date = request.Date, Portions = request.Portions };
         context.MenuItems.Add(menuItem);
         await context.SaveChangesAsync();
-        return TypedResults.Created($"/menuItems/{menuItem.Id}", new MenuItemDto(menuItem.Id, menuItem.Date, menuItem.Portions));
+        return TypedResults.Created($"/menuItems/{menuItem.Id}", new MenuItemDto(menuItem.Id, menuItem.Date, menuItem.Portions, menuItem.MinuteMealId));
     }
 
     public static async Task<Ok<MenuItemDto[]>> GetAllMenuItems(MinuteContext context)
     {
-        var menuItems = await context.MenuItems.Select(mi => new MenuItemDto(mi.Id, mi.Date, mi.Portions)).ToArrayAsync();
+        var menuItems = await context.MenuItems.Select(mi => new MenuItemDto(mi.Id, mi.Date, mi.Portions, mi.MinuteMealId)).ToArrayAsync();
         return TypedResults.Ok(menuItems);
     }
     
@@ -185,6 +189,20 @@ public static class WebApiVersion1
         }
     }
 
+    public static async Task<Results<NoContent, NotFound>> ChangeMenuItemMeal(int id, MenuItemPatchMeal patch,  MinuteContext context)
+    {
+        if(await context.MenuItems.FindAsync(id) is MenuItem item)
+        {
+            item.MinuteMealId = patch.MinuteMealId;
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
+    }
+
     public static async Task<Results<NoContent, NotFound>> PutMenuItem(int id, MenuItemRequestDto request, MinuteContext context)
     {
         if(await context.MenuItems.FindAsync(id) is MenuItem item)
@@ -202,7 +220,57 @@ public static class WebApiVersion1
 
     public static async Task<Ok<OrderDto[]>> GetAllOrders(MinuteContext context)
     {
-        var orders = await context.Orders.Select(o => new OrderDto(o.Id, o.OrderStatus)).ToArrayAsync();
+        var orders = await context.Orders.Select(o => new OrderDto(o.Id, o.OrderStatus, o.MenuItemId)).ToArrayAsync();
         return TypedResults.Ok(orders);
+    }
+
+    public static async Task<Created<OrderDto>> CreateOrder(OrderRequestDto request, MinuteContext context)
+    {
+        var order = new Order { OrderStatus =  request.status, MenuItemId = request.MenuItemId};
+        context.Orders.Add(order);
+        await context.SaveChangesAsync();
+        return TypedResults.Created($"/orders/{order.Id}", new OrderDto(order.Id, order.OrderStatus, order.MenuItemId));
+    }
+
+    public static async Task<Results<NoContent, NotFound>> PutOrder(int id, OrderRequestDto request, MinuteContext context)
+    {
+        if(await context.Orders.FindAsync(id) is Order order)
+        {
+            order.OrderStatus = request.status;
+            order.MenuItemId = request.MenuItemId;
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
+    }
+
+    public static async Task<Results<NoContent, NotFound>> OrderChangeStatus(int id, OrderPatchStatusDto patch, MinuteContext context)
+    {
+        if(await context.Orders.FindAsync(id) is Order order)
+        {
+            order.OrderStatus = patch.status;
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
+    }
+    public static async Task<Results<NoContent, NotFound>> PatchOrderMenuItem(int id, OrderPatchMenuItemDto patch, MinuteContext context)
+    {
+        if(await context.Orders.FindAsync(id) is Order order)
+        {
+            order.MenuItemId = patch.MenuItemId;
+            await context.SaveChangesAsync();
+            return TypedResults.NoContent();
+        }
+        else
+        {
+            return TypedResults.NotFound();
+        }
     }
 }
