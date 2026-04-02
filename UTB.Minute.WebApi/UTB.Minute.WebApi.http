@@ -1,7 +1,5 @@
 @UTB.Minute.WebApi_HostAddress = https://localhost:7254
 
-
-
 GET {{UTB.Minute.WebApi_HostAddress}}/menuItems
 
 ###
@@ -41,6 +39,19 @@ Content-Type: application/json
 
 ###
 
+PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/1/meal
+Content-Type: application/json
+
+{
+  "minuteMealId": 2
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/2/portion
+
+###
+
 PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/1/portions
 Content-Type: application/json
 
@@ -59,7 +70,8 @@ Content-Type: application/json
 
 {
   "desc": "Bolonske spagety",
-  "price": 129.99
+  "price": 129.99,
+  "isActive": false
 }
 
 ###
@@ -101,10 +113,44 @@ Content-Type: application/json
 
 ###
 
-PATCH {{UTB.Minute.WebApi_HostAddress}}/menuItems/1/portion
+GET {{UTB.Minute.WebApi_HostAddress}}/orders
 
 ###
 
-GET {{UTB.Minute.WebApi_HostAddress}}/orders
+POST {{UTB.Minute.WebApi_HostAddress}}/orders
+Content-Type: application/json
+
+{
+  "status": 1,
+  "menuItemId": 3
+}
+
+###
+
+PUT {{UTB.Minute.WebApi_HostAddress}}/orders/1
+Content-Type: application/json
+
+{
+  "status": 2,
+  "menuItemId": 3
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/orders/1/menuItem
+Content-Type: application/json
+
+{
+  "menuItemId": 2
+}
+
+###
+
+PATCH {{UTB.Minute.WebApi_HostAddress}}/orders/1/status
+Content-Type: application/json
+
+{
+  "status": 3
+}
 
 ###
