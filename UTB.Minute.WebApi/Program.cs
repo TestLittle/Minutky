@@ -45,27 +45,27 @@ public static class WebApiVersion1
 {
     public static async Task<Ok<MinuteMealDto[]>> GetAllMinuteMeals(MinuteContext context)
     {
-        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.isActive)).ToArrayAsync();
+        var meals = await context.MinuteMeals.Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.IsActive)).ToArrayAsync();
 
         return TypedResults.Ok(meals);
     }
     
     public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealRequestDto request, MinuteContext context)
     {
-        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, isActive = request.isActive};
+        var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, IsActive = request.IsActive};
 
         context.MinuteMeals.Add(meal);
         await context.SaveChangesAsync();
 
-        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price, meal.isActive);
+        MinuteMealDto mealDto = new MinuteMealDto(meal.Id, meal.Desc, meal.Price, meal.IsActive);
         return TypedResults.Created($"/minuteMeals/{meal.Id}", mealDto);
     }
 
-    public static async Task<Results<NoContent, NotFound>> ChangeActiveStatusMinuteMeal(int id, MinuteMealPatchisActiveDto patch, MinuteContext context)
+    public static async Task<Results<NoContent, NotFound>> ChangeActiveStatusMinuteMeal(int id, MinuteMealPatchIsActiveDto patch, MinuteContext context)
     {
         if(await context.MinuteMeals.FindAsync(id) is MinuteMeal meal)
         {
-            meal.isActive = patch.isActive;
+            meal.IsActive = patch.IsActive;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }
@@ -81,7 +81,7 @@ public static class WebApiVersion1
         {
             meal.Desc = request.Desc;
             meal.Price = request.Price;
-            meal.isActive = request.isActive;
+            meal.IsActive = request.IsActive;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }
