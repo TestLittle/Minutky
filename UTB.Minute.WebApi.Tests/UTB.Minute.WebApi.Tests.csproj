@@ -25,6 +25,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\UTB.Minute.AppHost\UTB.Minute.AppHost.csproj" />
+    <ProjectReference Include="..\UTB.Minute.Db\UTB.Minute.Db.csproj" />
     <ProjectReference Include="..\UTB.Minute.WebApi\UTB.Minute.WebApi.csproj" />
   </ItemGroup>
 

@@ -1,9 +1,21 @@
+using Microsoft.Extensions.Hosting;
+
 var builder = DistributedApplication.CreateBuilder(args);
 
-var sql = builder.AddSqlServer("sql", port:55555)
+IResourceBuilder<SqlServerServerResource> sql;
+
+if (builder.Environment.IsEnvironment("Testing"))
+{
+    sql = builder.AddSqlServer("sql-testing", port: 55550)
+                 .WithContainerName("testing-minutky-sql-server");
+}
+else
+{
+    sql = builder.AddSqlServer("sql", port: 55555)
                  .WithDataVolume()
                  .WithLifetime(ContainerLifetime.Persistent)
                  .WithContainerName("minutky-sql-server");
+}
 
 var database = sql.AddDatabase("database");
 
