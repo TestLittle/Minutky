@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using UTB.Minute.Contracts;
 using UTB.Minute.Db;
 
@@ -14,6 +15,7 @@ var app = builder.Build();
 app.MapDefaultEndpoints();
 
 app.MapGet("/minuteMeals", WebApiVersion1.GetAllMinuteMeals);
+app.MapGet("/minuteMeals/active", WebApiVersion1.GetAllActiveMinuteMeals);
 app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal);
 app.MapPatch("/minuteMeals/{id}/active", WebApiVersion1.ChangeActiveStatusMinuteMeal);
 app.MapPut("/minuteMeals/{id}", WebApiVersion1.PutMinuteMeal);
@@ -49,7 +51,15 @@ public static class WebApiVersion1
 
         return TypedResults.Ok(meals);
     }
-    
+
+    public static async Task<Ok<MinuteMealDto[]>> GetAllActiveMinuteMeals(MinuteContext context)
+    {
+        var query = context.MinuteMeals.AsQueryable();
+        MinuteMealDto[] meals = await query.Where(m => m.IsActive == true).Select(m => new MinuteMealDto(m.Id, m.Desc, m.Price, m.IsActive)).ToArrayAsync();
+
+        return TypedResults.Ok(meals);
+    }
+
     public static async Task<Created<MinuteMealDto>> CreateMinuteMeal(MinuteMealRequestDto request, MinuteContext context)
     {
         var meal = new MinuteMeal { Desc = request.Desc, Price = request.Price, IsActive = request.IsActive};
@@ -119,9 +129,12 @@ public static class WebApiVersion1
         }
     }
 
-    public static async Task<Created<MenuItemDto>> CreateMenuItem(MenuItemRequestDto request, MinuteContext context)
+    public static async Task<Results<Created<MenuItemDto>, BadRequest<string>>> CreateMenuItem(MenuItemRequestDto request, MinuteContext context)
     {
-        MenuItem menuItem = new MenuItem() { Date = request.Date, Portions = request.Portions };
+        var meal = await context.MinuteMeals.FirstOrDefaultAsync(m => m.IsActive);
+        if (meal == null) return TypedResults.BadRequest("Zadne aktivni jidlo neexistuje.");
+
+        MenuItem menuItem = new MenuItem() { Date = request.Date, Portions = request.Portions, MinuteMealId = request.MinuteMealId};
         context.MenuItems.Add(menuItem);
         await context.SaveChangesAsync();
         return TypedResults.Created($"/menuItems/{menuItem.Id}", new MenuItemDto(menuItem.Id, menuItem.Date, menuItem.Portions, menuItem.MinuteMealId));
@@ -224,8 +237,11 @@ public static class WebApiVersion1
         return TypedResults.Ok(orders);
     }
 
-    public static async Task<Created<OrderDto>> CreateOrder(OrderRequestDto request, MinuteContext context)
+    public static async Task<Results<Created<OrderDto>, BadRequest<string>, Conflict<string>>> CreateOrder(OrderRequestDto request, MinuteContext context)
     {
+        var item = await context.MenuItems.FindAsync(request.MenuItemId);
+        if (item == null || item.Portions <= 0) return TypedResults.BadRequest("Sold out.");
+        item.Portions--;
         var order = new Order { OrderStatus =  request.status, MenuItemId = request.MenuItemId};
         context.Orders.Add(order);
         await context.SaveChangesAsync();

@@ -65,6 +65,10 @@ GET {{UTB.Minute.WebApi_HostAddress}}/minuteMeals
 
 ###
 
+GET {{UTB.Minute.WebApi_HostAddress}}/minuteMeals/active
+
+###
+
 POST {{UTB.Minute.WebApi_HostAddress}}/minuteMeals
 Content-Type: application/json
 
