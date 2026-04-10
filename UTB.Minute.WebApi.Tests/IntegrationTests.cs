@@ -44,13 +44,13 @@ namespace UTB.Minute.WebApi.Tests;
             var response = await fixture.HttpClient.PostAsJsonAsync("/minuteMeals", request, TestContext.Current.CancellationToken);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-            MinuteMeal? meal = await response.Content.ReadFromJsonAsync<MinuteMeal>(TestContext.Current.CancellationToken);
+            MinuteMealDto? meal = await response.Content.ReadFromJsonAsync<MinuteMealDto>(TestContext.Current.CancellationToken);
             Assert.NotNull(meal);
             Assert.Equal(request.Desc, meal.Desc);
             Assert.Equal(request.Price, meal.Price);
             Assert.False(meal.IsActive);
             Assert.NotNull(response.Headers.Location);
-            Assert.EndsWith($"/minuteMeals/{meal.Id}", response.Headers.Location.ToString());
+            Assert.EndsWith($"/minuteMeals/{meal.MinuteMealId}", response.Headers.Location.ToString());
         }
 
         [Fact]
