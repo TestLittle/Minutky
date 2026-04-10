@@ -6,5 +6,4 @@ namespace UTB.Minute.Contracts
     public record OrderRequestDto(OrderStatus status, int MenuItemId);
     public record OrderPatchStatusDto(OrderStatus status);
     public record OrderPatchMenuItemDto(int MenuItemId);
-    //K requestu dodat id foreign keys
 }
