@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using UTB.Minute.Db;
 using System.Net.Http.Json;
 using UTB.Minute.Contracts;
 
