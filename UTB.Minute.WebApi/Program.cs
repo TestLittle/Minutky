@@ -131,8 +131,9 @@ public static class WebApiVersion1
 
     public static async Task<Results<Created<MenuItemDto>, BadRequest<string>>> CreateMenuItem(MenuItemRequestDto request, MinuteContext context)
     {
-        var meal = await context.MinuteMeals.FirstOrDefaultAsync(m => m.IsActive);
-        if (meal == null) return TypedResults.BadRequest("Zadne aktivni jidlo neexistuje.");
+        var meal = await context.MinuteMeals.FindAsync(request.MinuteMealId);
+        if (meal == null || !meal.IsActive)
+            return TypedResults.BadRequest("Zadané jídlo neexistuje nebo není aktivní.");
 
         MenuItem menuItem = new MenuItem() { Date = request.Date, Portions = request.Portions, MinuteMealId = request.MinuteMealId};
         context.MenuItems.Add(menuItem);
@@ -289,4 +290,5 @@ public static class WebApiVersion1
             return TypedResults.NotFound();
         }
     }
+
 }
