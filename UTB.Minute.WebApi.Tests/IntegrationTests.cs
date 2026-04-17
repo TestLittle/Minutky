@@ -46,7 +46,7 @@ namespace UTB.Minute.WebApi.Tests;
             var response = await fixture.HttpClient.PostAsJsonAsync("/minuteMeals", request, ct);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
-            MinuteMealDto? meal = await response.Content.ReadFromJsonAsync<MinuteMealDto>(TestContext.Current.CancellationToken);
+            MinuteMealDto? meal = await response.Content.ReadFromJsonAsync<MinuteMealDto>(ct);
             Assert.NotNull(meal);
             Assert.Equal(request.Desc, meal.Desc);
             Assert.Equal(request.Price, meal.Price);
@@ -59,22 +59,24 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task ChangeActiveStatusMinuteMeal_ChangesValueToTrue()
         {
             // id je v seedu  = false
+            var ct = TestContext.Current.CancellationToken;
             MinuteMealPatchIsActiveDto patch = new(true);
-            var response = await fixture.HttpClient.PatchAsJsonAsync("/minuteMeals/3/active", patch);
+            var response = await fixture.HttpClient.PatchAsJsonAsync("/minuteMeals/3/active", patch, ct);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
             // overeni
-            var getResponse = await fixture.HttpClient.GetAsync("/minuteMeals");
-            var meals = await getResponse.Content.ReadFromJsonAsync<MinuteMealDto[]>();
+            var getResponse = await fixture.HttpClient.GetAsync("/minuteMeals", ct);
+            var meals = await getResponse.Content.ReadFromJsonAsync<MinuteMealDto[]>(ct);
             Assert.True(meals!.First(m => m.MinuteMealId == 3).IsActive);
         }
 
         [Fact]
         public async Task PutMinuteMeal_InvalidId_ReturnsNotFound()
         {
+            var ct = TestContext.Current.CancellationToken;
             var request = new MinuteMealRequestDto("Neexistujici", 100, true);
-            var response = await fixture.HttpClient.PutAsJsonAsync("/minuteMeals/9999", request);
+            var response = await fixture.HttpClient.PutAsJsonAsync("/minuteMeals/9999", request, ct);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -86,9 +88,10 @@ namespace UTB.Minute.WebApi.Tests;
         [Fact]
         public async Task GetAllMenuItems_ReturnsSeededItems()
         {
-            var response = await fixture.HttpClient.GetAsync("/menuItems");
+            var ct = TestContext.Current.CancellationToken;
+            var response = await fixture.HttpClient.GetAsync("/menuItems", ct);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var items = await response.Content.ReadFromJsonAsync<MenuItemDto[]>();
+            var items = await response.Content.ReadFromJsonAsync<MenuItemDto[]>(ct);
 
             Assert.NotNull(items);
             Assert.NotEmpty(items);
@@ -97,8 +100,9 @@ namespace UTB.Minute.WebApi.Tests;
         [Fact]
         public async Task CreateMenuItem_ValidRequest_ReturnsCreated()
         {
+            var ct = TestContext.Current.CancellationToken;
             var request = new MenuItemRequestDto(DateTime.Now.AddDays(1), 50, 1);
-            var response = await fixture.HttpClient.PostAsJsonAsync("/menuItems", request);
+            var response = await fixture.HttpClient.PostAsJsonAsync("/menuItems", request, ct);
 
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         }
@@ -107,11 +111,12 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task DeleteMenuItem_ValidId_ReturnsNoContent()
         {
             //id 2 pryc 
-            var response = await fixture.HttpClient.DeleteAsync("/menuItems/2");
+            var ct = TestContext.Current.CancellationToken;
+            var response = await fixture.HttpClient.DeleteAsync("/menuItems/2", ct);
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-            var getRes = await fixture.HttpClient.GetAsync("/menuItems");
-            var items = await getRes.Content.ReadFromJsonAsync<MenuItemDto[]>();
+            var getRes = await fixture.HttpClient.GetAsync("/menuItems", ct);
+            var items = await getRes.Content.ReadFromJsonAsync<MenuItemDto[]>(ct);
             Assert.DoesNotContain(items!, i => i.MenuItemId == 2);
         }
 
@@ -119,9 +124,10 @@ namespace UTB.Minute.WebApi.Tests;
         [Fact]
         public async Task GetAllOrders_ReturnsSeededOrder()
         {
-            var response = await fixture.HttpClient.GetAsync("/orders");
+            var ct = TestContext.Current.CancellationToken;
+            var response = await fixture.HttpClient.GetAsync("/orders", ct);
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var orders = await response.Content.ReadFromJsonAsync<OrderDto[]>();
+            var orders = await response.Content.ReadFromJsonAsync<OrderDto[]>(ct);
 
             Assert.NotNull(orders);
             Assert.NotEmpty(orders);
@@ -131,21 +137,23 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task CreateOrder_ValidRequest_DecreasesPortions()
         {
             // id 1 ma 12 porci....
+            var ct = TestContext.Current.CancellationToken;
             var request = new OrderRequestDto(OrderStatus.Preparing, 1);
-            var response = await fixture.HttpClient.PostAsJsonAsync("/orders", request);
+            var response = await fixture.HttpClient.PostAsJsonAsync("/orders", request, ct);
             Assert.Equal(HttpStatusCode.Created, response.StatusCode);
 
             // kontrola ze se kleso
-            var menuRes = await fixture.HttpClient.GetAsync("/menuItems");
-            var items = await menuRes.Content.ReadFromJsonAsync<MenuItemDto[]>();
+            var menuRes = await fixture.HttpClient.GetAsync("/menuItems", ct);
+            var items = await menuRes.Content.ReadFromJsonAsync<MenuItemDto[]>(ct);
             Assert.Equal(11, items!.First(i => i.MenuItemId == 1).Portions);
         }
 
         [Fact]
         public async Task OrderChangeStatus_ValidId_UpdatesStatus()
         {
+            var ct = TestContext.Current.CancellationToken;
             var patch = new OrderPatchStatusDto(OrderStatus.Completed);
-            var response = await fixture.HttpClient.PatchAsJsonAsync("/orders/1/status", patch);
+            var response = await fixture.HttpClient.PatchAsJsonAsync("/orders/1/status", patch, ct);
 
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         }
@@ -155,7 +163,8 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task DeleteMenuItem_InvalidId_ReturnsNotFound()
         {
             // smaze se id ktere neni
-            var response = await fixture.HttpClient.DeleteAsync("/menuItems/9999");
+            var ct = TestContext.Current.CancellationToken;
+            var response = await fixture.HttpClient.DeleteAsync("/menuItems/9999", ct);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -164,8 +173,9 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task OrderChangeStatus_InvalidId_ReturnsNotFound()
         {
             // zmena stavu objednavky (ktera neexistuje)
+            var ct = TestContext.Current.CancellationToken;
             var patch = new OrderPatchStatusDto(OrderStatus.Completed);
-            var response = await fixture.HttpClient.PatchAsJsonAsync("/orders/9999/status", patch);
+            var response = await fixture.HttpClient.PatchAsJsonAsync("/orders/9999/status", patch, ct);
 
             Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
         }
@@ -173,8 +183,9 @@ namespace UTB.Minute.WebApi.Tests;
         public async Task CreateOrder_InvalidMenuItemId_ReturnsBadRequest()
         {
             // kontrola if item = null (jidlo s id ktere neexistuje)
+            var ct = TestContext.Current.CancellationToken;
             var request = new OrderRequestDto(OrderStatus.Preparing, 8888);
-            var response = await fixture.HttpClient.PostAsJsonAsync("/orders", request);
+            var response = await fixture.HttpClient.PostAsJsonAsync("/orders", request, ct);
 
             Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
         }
