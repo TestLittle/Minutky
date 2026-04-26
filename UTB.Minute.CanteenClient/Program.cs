@@ -1,5 +1,5 @@
 using UTB.Minute.CanteenClient.Components;
-
+using UTB.Minute.CanteenClient.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
@@ -7,7 +7,10 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-
+builder.Services.AddHttpClient<CanteenApiClient>(client =>
+{
+    client.BaseAddress = new Uri("http://webapi");
+});
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

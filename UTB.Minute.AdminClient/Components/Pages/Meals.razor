@@ -1,0 +1,128 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using UTB.Minute.AdminClient.Services
+@using UTB.Minute.Contracts
+@inject MinuteApiClient Api
+
+<PageTitle>Správa jídel</PageTitle>
+
+<h1>Správa jídel v menze</h1>
+
+<div class="card p-3 my-4 shadow-sm">
+    <h4>Přidat nové jídlo</h4>
+    <div class="row g-3">
+        <div class="col-md-5">
+            <label class="form-label">Název jídla</label>
+            <input class="form-control" placeholder="Např. Svíčková na smetaně" @bind="newMealName" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Cena</label>
+            <div class="input-group">
+                @* type="number" tam necháme kvůli mobilům, ale zbavíme se nuly *@
+                <input type="number" class="form-control" placeholder="0.00" @bind="newMealPrice" step="0.01" />
+                <span class="input-group-text">Kč</span>
+            </div>
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button class="btn @(editingMealId == null ? "btn-primary" : "btn-warning") w-100" @onclick="SaveMeal">
+                @(editingMealId == null ? "Uložit jídlo" : "Uložit změny")
+            </button>
+        </div>
+    </div>
+    @* MALÉ CHYBOVÉ HLÁŠENÍ *@
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <div class="alert alert-danger mt-2">@errorMessage</div>
+    }
+</div>
+@if (meals == null)
+{
+    <p><em>Načítám data z API...</em></p>
+}
+else
+{
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Název</th>
+                <th>Cena</th>
+                <th>Aktivní</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var meal in meals)
+            {
+                <tr>
+                    <td>@meal.Desc</td>
+                    <td>@meal.Price Kč</td>
+                    <td>@(meal.IsActive ? "✅" : "❌")</td>
+                    <td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleMeal(meal)">Přepnout stav</button>
+                            <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(meal)">Upravit</button>
+                        </td>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    @code {
+        private List<MinuteMealDto>? meals;
+        private string newMealName = "";
+        private double? newMealPrice;
+        private string errorMessage = "";
+
+        // PŘIDÁME: Sledování, jestli zrovna neupravujeme
+        private int? editingMealId;
+
+        protected override async Task OnInitializedAsync() => await LoadData();
+        private async Task LoadData() => meals = await Api.GetMealsAsync();
+
+        // PŘIDÁME: Načtení jídla do formuláře
+        private void StartEdit(MinuteMealDto meal)
+        {
+            editingMealId = meal.MinuteMealId;
+            newMealName = meal.Desc;
+            newMealPrice = meal.Price;
+        }
+
+        private async Task SaveMeal()
+        {
+            errorMessage = "";
+            if (string.IsNullOrWhiteSpace(newMealName) || newMealPrice == null || newMealPrice <= 0)
+            {
+                errorMessage = "Zadejte platný název a cenu.";
+                return;
+            }
+
+            var request = new MinuteMealRequestDto(newMealName, newMealPrice.Value, true);
+
+            if (editingMealId == null)
+            {
+                await Api.CreateMealAsync(request);
+            }
+            else
+            {
+                // ÚPRAVA STÁVAJÍCÍHO
+                await Api.UpdateMealAsync(editingMealId.Value, request);
+                editingMealId = null; // Resetujeme režim
+            }
+
+            newMealName = "";
+            newMealPrice = null;
+            await LoadData();
+        }
+
+        private async Task ToggleMeal(MinuteMealDto meal)
+        {
+            await Api.ToggleMealActiveAsync(meal.MinuteMealId, !meal.IsActive);
+            await LoadData();
+        }
+    }
+    }

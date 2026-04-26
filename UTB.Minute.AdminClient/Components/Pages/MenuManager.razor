@@ -1,0 +1,134 @@
+﻿@page "/menu-manager"
+@using UTB.Minute.AdminClient.Services
+@using UTB.Minute.Contracts
+@inject MinuteApiClient Api
+@rendermode InteractiveServer
+
+<PageTitle>Plánování menu</PageTitle>
+
+<h1>Plánování menu menzy</h1>
+
+<div class="card p-3 my-4 shadow-sm">
+    <h4>Naplánovat jídlo na den</h4>
+    <div class="row g-3">
+        <div class="col-md-4">
+            <label class="form-label">Vybrat jídlo</label>
+            <select class="form-select" @bind="selectedMealId">
+                <option value="0">-- Vyberte jídlo --</option>
+                @foreach (var meal in activeMeals)
+                {
+                    <option value="@meal.MinuteMealId">@meal.Desc (@meal.Price Kč)</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label">Datum</label>
+            <input type="date" class="form-control" @bind="selectedDate" />
+        </div>
+        <div class="col-md-2">
+            <label class="form-label">Porcí</label>
+            <input type="number" class="form-control" @bind="portions" />
+        </div>
+        <div class="col-md-3 d-flex align-items-end">
+            <button class="btn @(editingId == null ? "btn-success" : "btn-warning") w-100" @onclick="SaveMenuItem">
+                @(editingId == null ? "Přidat do menu" : "Uložit změny")
+            </button>
+        </div>
+    </div>
+</div>
+
+@if (menuItems == null)
+{
+    <p>Načítám menu...</p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Datum</th>
+                <th>Jídlo (ID)</th>
+                <th>Dostupné porce</th>
+                <th>Akce</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in menuItems.OrderBy(i => i.Date))
+            {
+                <tr>
+                    <td>@item.Date.ToShortDateString()</td>
+                    <td>
+                        @(allMeals.FirstOrDefault(m => m.MinuteMealId == item.MinuteMealId)?.Desc ?? $"Jídlo ID: {item.MinuteMealId}")
+                    </td>
+                    <td>@item.Portions ks</td>
+                    <td>
+                        <button class="btn btn-outline-danger btn-sm" @onclick="() => DeleteItem(item.MenuItemId)">Smazat</button>
+                        <button class="btn btn-outline-primary btn-sm" @onclick="() => StartEdit(item)">Upravit</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<MenuItemDto>? menuItems;
+    private List<MinuteMealDto> activeMeals = new();
+    private List<MinuteMealDto> allMeals = new(); // Přidej tohle
+    // Proměnné pro formulář
+    private int selectedMealId;
+    private DateTime selectedDate = DateTime.Today;
+    private int portions = 50;
+
+    private int? editingId; // null = nové jídlo, číslo = upravujeme
+
+    private void StartEdit(MenuItemDto item)
+    {
+        editingId = item.MenuItemId;
+        selectedMealId = item.MinuteMealId;
+        selectedDate = item.Date;
+        portions = item.Portions;
+    }
+
+    private async Task SaveMenuItem()
+    {
+        if (selectedMealId == 0 || portions <= 0) return;
+
+        var request = new MenuItemRequestDto(selectedDate, portions, selectedMealId);
+
+        if (editingId == null)
+        {
+            await Api.CreateMenuItemAsync(request);
+        }
+        else
+        {
+            await Api.UpdateMenuItemAsync(editingId.Value, request);
+            editingId = null; // Po uložení ukončíme režim úprav
+        }
+
+        await LoadData();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        menuItems = await Api.GetMenuItemsAsync();
+
+        // 1. Načti úplně všechna jídla (i ta neaktivní) pro tabulku
+        allMeals = await Api.GetMealsAsync();
+
+        // 2. Pro výběr (dropdown) si vyfiltruj jen ta aktivní
+        activeMeals = allMeals.Where(m => m.IsActive).ToList();
+    }
+
+
+    private async Task DeleteItem(int id)
+    {
+        await Api.DeleteMenuItemAsync(id);
+        await LoadData();
+    }
+}

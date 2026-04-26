@@ -223,6 +223,7 @@ public static class WebApiVersion1
         {
             item.Date = request.Date;
             item.Portions = request.Portions;
+            item.MinuteMealId = request.MinuteMealId;
             await context.SaveChangesAsync();
             return TypedResults.NoContent();
         }

@@ -1,4 +1,5 @@
 using UTB.Minute.AdminClient.Components;
+using UTB.Minute.AdminClient.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,10 @@ builder.AddServiceDefaults();
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddHttpClient<MinuteApiClient>(client =>
+{
+    client.BaseAddress = new Uri("http://webapi");
+});
 
 var app = builder.Build();
 

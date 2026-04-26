@@ -1,0 +1,82 @@
+﻿@page "/my-orders"
+@using UTB.Minute.CanteenClient.Services
+@using UTB.Minute.Contracts
+@using UTB.Minute.Db
+@inject CanteenApiClient Api
+@rendermode InteractiveServer
+
+<h3>Moje objednávky 📝</h3>
+
+<div class="list-group mt-3">
+    @if (orders == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Načítám tvé objednávky...</p>
+        </div>
+    }
+    else if (!orders.Any())
+    {
+        <div class="alert alert-light text-center">
+            Zatím nemáš žádné objednávky. Šup do menu! 🍕
+        </div>
+    }
+    else
+    {
+        @foreach (var order in orders.AsEnumerable().Reverse()) @* Nejnovější nahoře *@
+        {
+            <div class="list-group-item d-flex justify-content-between align-items-center shadow-sm mb-2 rounded">
+                <div>
+                    <strong>Objednávka č. @order.OrderId</strong>
+                    <br />
+                    <small class="text-muted">Jídlo: @GetMealName(order.MenuItemId)</small>
+                </div>
+
+                @* TADY POUŽÍVÁME PŘEKLAD I BARVU *@
+                <span class="badge @GetStatusClass(order.status) p-2">
+                    @TranslateStatus(order.status)
+                </span>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private List<OrderDto>? orders;
+    private List<MinuteMealDto> allMeals = new();
+    private List<MenuItemDto> allMenuItems = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        orders = await Api.GetOrdersAsync();
+        allMeals = await Api.GetMealsAsync();
+        allMenuItems = await Api.GetMenuItemsAsync();
+    }
+
+    private string GetMealName(int menuItemId)
+    {
+        var menuItem = allMenuItems.FirstOrDefault(mi => mi.MenuItemId == menuItemId);
+        var meal = allMeals.FirstOrDefault(m => m.MinuteMealId == menuItem?.MinuteMealId);
+        return meal?.Desc ?? "Neznámé jídlo";
+    }
+
+    // --- PŘEVODNÍKY PRO ČESKÉ UI ---
+
+    private string TranslateStatus(OrderStatus status) => status switch
+    {
+        OrderStatus.Preparing => "V přípravě",
+        OrderStatus.Ready => "Připraveno k odběru",
+        OrderStatus.Cancelled => "Zrušeno",
+        OrderStatus.Completed => "Vyřízeno", // Neutrální slovo
+        _ => "Neznámý stav"
+    };
+
+    private string GetStatusClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Preparing => "bg-warning text-dark",
+        OrderStatus.Ready => "bg-success",
+        OrderStatus.Cancelled => "bg-danger",
+        OrderStatus.Completed => "bg-secondary",
+        _ => "bg-info"
+    };
+}

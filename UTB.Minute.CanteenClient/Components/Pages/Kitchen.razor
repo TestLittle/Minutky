@@ -1,0 +1,87 @@
+﻿@page "/kitchen"
+@using UTB.Minute.CanteenClient.Services
+@using UTB.Minute.Contracts
+@using UTB.Minute.Db
+@inject CanteenApiClient Api
+@rendermode InteractiveServer
+
+<h3>Pohled kuchařky 👩‍🍳</h3>
+
+@if (orders == null)
+{
+    <div class="text-center">
+        <div class="spinner-border text-primary" role="status"></div>
+        <p>Načítám objednávky...</p>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var order in orders.Where(o => o.status != OrderStatus.Completed))
+        {
+            <div class="col-md-4 mb-3">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">Objednávka #@order.OrderId</h5>
+
+                        @* TADY POUŽIJEME PŘEVODNÍK *@
+                        <p class="card-text">Stav: <span class="badge @GetBadgeClass(order.status)">@TranslateStatus(order.status)</span></p>
+
+                        <div class="d-grid gap-2 mt-3">
+                            @if (order.status == OrderStatus.Preparing)
+                            {
+                                <button class="btn btn-success" @onclick="() => ChangeStatus(order.OrderId, OrderStatus.Ready)">✅ HOTOVO</button>
+                                <button class="btn btn-danger" @onclick="() => ChangeStatus(order.OrderId, OrderStatus.Cancelled)">❌ ZRUŠIT</button>
+                            }
+                            @if (order.status == OrderStatus.Ready)
+                            {
+                                <button class="btn btn-primary" @onclick="() => ChangeStatus(order.OrderId, OrderStatus.Completed)">
+                                    📦 VYDÁNO (Student si jídlo vzal)
+                                </button>
+                            }
+                            @if (order.status == OrderStatus.Cancelled)
+                            {
+                                <button class="btn btn-secondary" @onclick="() => ChangeStatus(order.OrderId, OrderStatus.Completed)">
+                                    🗑️ OK (Vzato na vědomí / Odstranit)
+                                </button>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@code {
+    private List<OrderDto>? orders;
+
+    protected override async Task OnInitializedAsync() => await LoadOrders();
+
+    private async Task LoadOrders() => orders = await Api.GetOrdersAsync();
+
+    private async Task ChangeStatus(int id, OrderStatus status)
+    {
+        await Api.UpdateOrderStatusAsync(id, status);
+        await LoadOrders();
+    }
+
+    // --- PŘEVODNÍKY PRO UI ---
+
+    private string TranslateStatus(OrderStatus status) => status switch
+    {
+        OrderStatus.Preparing => "Připravuje se",
+        OrderStatus.Ready => "Hotovo k odběru",
+        OrderStatus.Cancelled => "Zrušeno",
+        OrderStatus.Completed => "Vydáno",
+        _ => "Neznámý stav"
+    };
+
+    private string GetBadgeClass(OrderStatus status) => status switch
+    {
+        OrderStatus.Preparing => "bg-warning text-dark",
+        OrderStatus.Ready => "bg-success",
+        OrderStatus.Cancelled => "bg-danger",
+        _ => "bg-secondary"
+    };
+}

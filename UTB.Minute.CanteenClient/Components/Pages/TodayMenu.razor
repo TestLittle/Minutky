@@ -1,0 +1,87 @@
+﻿@page "/"
+@using UTB.Minute.CanteenClient.Services
+@using UTB.Minute.Contracts
+@using UTB.Minute.Db
+@inject CanteenApiClient Api
+@rendermode InteractiveServer
+
+<PageTitle>Dnešní nabídka</PageTitle>
+
+<div class="container mt-4">
+    <h1 class="mb-4 text-center">Dnešní menu 🍴</h1>
+
+    @if (todayItems == null)
+    {
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p>Připravujeme dnešní dobroty...</p>
+        </div>
+    }
+    else if (!todayItems.Any())
+    {
+        <div class="alert alert-info text-center">
+            Na dnešek není naplánované žádné menu. Zkuste to zítra!
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in todayItems)
+            {
+                var meal = allMeals.FirstOrDefault(m => m.MinuteMealId == item.MinuteMealId);
+                bool isSoldOut = item.Portions <= 0;
+
+                <div class="col">
+                    @* Karta se zbarví do šeda, pokud je vyprodáno *@
+                    <div class="card h-100 shadow-sm @(isSoldOut ? "bg-light opacity-75" : "")">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">@(meal?.Desc ?? "Neznámé jídlo")</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@meal?.Price Kč</h6>
+
+                            <div class="mt-auto">
+                                @if (isSoldOut)
+                                {
+                                    <span class="badge bg-danger w-100 py-2">VYPRODÁNO</span>
+                                }
+                                else
+                                {
+                                    <p class="card-text small mb-3">Zbývá porcí: <strong>@item.Portions</strong></p>
+                                    <button class="btn btn-primary w-100" @onclick="() => PlaceOrder(item)">
+                                        Objednat
+                                    </button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<MenuItemDto>? todayItems;
+    private List<MinuteMealDto> allMeals = new();
+
+    protected override async Task OnInitializedAsync() => await LoadData();
+
+    private async Task LoadData()
+    {
+        allMeals = await Api.GetMealsAsync();
+        var allMenu = await Api.GetMenuItemsAsync();
+
+        // Vyfiltrujeme jen dnešní menu
+        todayItems = allMenu.Where(i => i.Date.Date == DateTime.Today).ToList();
+    }
+
+    private async Task PlaceOrder(MenuItemDto item)
+    {
+        // Vytvoříme objednávku (status 0 = Připravuje se)
+        var orderRequest = new OrderRequestDto(OrderStatus.Preparing, item.MenuItemId);
+
+        await Api.CreateOrderAsync(orderRequest);
+
+        // Refreshneme data, aby se hned odečetla porce v UI
+        await LoadData();
+    }
+}
