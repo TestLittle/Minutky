@@ -42,5 +42,4 @@ public class MinuteApiClient(HttpClient http)
     {
         await http.PutAsJsonAsync($"minuteMeals/{id}", meal);
     }
-
 }
