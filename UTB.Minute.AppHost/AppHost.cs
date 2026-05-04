@@ -24,27 +24,16 @@ builder.AddProject<Projects.UTB_Minute_DbManager>("utb-minute-dbmanager")
        .WithHttpCommand("reset-db", "Reset Database")
        .WaitFor(database);
 
-var keycloak = builder.AddKeycloak("keycloak", 8080)
-                      .WithContainerName("utb-minute-keycloak")
-                      .WithDataVolume("utb-minute-keycloak-data")
-                      .WithLifetime(ContainerLifetime.Persistent);
-
 var webapi = builder.AddProject<Projects.UTB_Minute_WebApi>("webapi")
        .WithReference(database)
-       .WithReference(keycloak)
-       .WaitFor(database)
-       .WaitFor(keycloak);
+       .WaitFor(database);
 
 builder.AddProject<Projects.UTB_Minute_CanteenClient>("utb-minute-canteenclient")
        .WithReference(webapi)
-       .WithReference(keycloak)
-       .WaitFor(webapi)
-       .WaitFor(keycloak);
+       .WaitFor(webapi);
 
 builder.AddProject<Projects.UTB_Minute_AdminClient>("utb-minute-adminclient")
        .WithReference(webapi)
-       .WithReference(keycloak)
-       .WaitFor(webapi)
-       .WaitFor(keycloak);
+       .WaitFor(webapi);
 
 builder.Build().Run();
