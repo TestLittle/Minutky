@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using UTB.Minute.Contracts;
 using UTB.Minute.Db;
 
@@ -10,7 +9,23 @@ builder.AddServiceDefaults();
 
 builder.AddSqlServerDbContext<MinuteContext>("database");
 
+builder.Services.AddAuthentication()
+    .AddKeycloakJwtBearer(
+        serviceName: "keycloak",
+        realm: "utb-school",
+        options =>
+        {
+            options.Audience = "utb-school-webapi";
+            options.RequireHttpsMetadata = false; // jen pro dev
+        }
+    );
+
+builder.Services.AddAuthorization();
+
 var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapDefaultEndpoints();
 
