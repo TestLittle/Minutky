@@ -1,4 +1,6 @@
-﻿namespace UTB.Minute.Db
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace UTB.Minute.Db
 {
     public class MenuItem
     {
@@ -10,5 +12,8 @@
         public MinuteMeal? MinuteMeal { get; set; }
 
         public List<Order> Orders { get; set; } = [];
+
+        [Timestamp]
+        public byte[]? Version { get; set; }
     }
 }

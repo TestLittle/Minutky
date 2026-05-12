@@ -204,12 +204,22 @@ public static class WebApiVersion1
         }
     }
 
-    public static async Task<Results<NoContent, NotFound>> DecreaseNumberOfPortions(int id, MinuteContext context)
+    public static async Task<Results<NoContent, NotFound, Conflict>> DecreaseNumberOfPortions(int id, MinuteContext context)
     {
         if(await context.MenuItems.FindAsync(id) is MenuItem item)
         {
-            item.Portions = item.Portions - 1;
-            await context.SaveChangesAsync();
+            if(item.Portions > 0)
+            {
+                item.Portions = item.Portions - 1;
+                try
+                {
+                    await context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    return TypedResults.Conflict();
+                }
+            }
             return TypedResults.NoContent();
         }
         else
