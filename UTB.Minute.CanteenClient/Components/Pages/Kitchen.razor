@@ -1,8 +1,11 @@
 ﻿@page "/kitchen"
 @using UTB.Minute.CanteenClient.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using UTB.Minute.Contracts
 @using UTB.Minute.Db
 @inject CanteenApiClient Api
+@attribute [Authorize(Roles = "cook")]
 @rendermode InteractiveServer
 
 <h3>Pohled kuchařky 👩‍🍳</h3>

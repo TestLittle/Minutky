@@ -1,7 +1,10 @@
 ﻿@page "/my-orders"
 @using UTB.Minute.CanteenClient.Services
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using UTB.Minute.Contracts
 @using UTB.Minute.Db
+@attribute [Authorize(Roles = "student")]
 @inject CanteenApiClient Api
 @rendermode InteractiveServer
 

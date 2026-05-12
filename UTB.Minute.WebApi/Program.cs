@@ -31,28 +31,26 @@ app.MapDefaultEndpoints();
 
 app.MapGet("/minuteMeals", WebApiVersion1.GetAllMinuteMeals);
 app.MapGet("/minuteMeals/active", WebApiVersion1.GetAllActiveMinuteMeals);
-app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal);
-app.MapPatch("/minuteMeals/{id}/active", WebApiVersion1.ChangeActiveStatusMinuteMeal);
-app.MapPut("/minuteMeals/{id}", WebApiVersion1.PutMinuteMeal);
-app.MapPatch("/minuteMeals/{id}/desc", WebApiVersion1.PatchDescMinuteMeal);
-app.MapPatch("/minuteMeals/{id}/price", WebApiVersion1.PatchPriceMinuteMeal);
+app.MapPost("/minuteMeals", WebApiVersion1.CreateMinuteMeal).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/minuteMeals/{id}/active", WebApiVersion1.ChangeActiveStatusMinuteMeal).RequireAuthorization(pb => pb.RequireRole("cook"));
+app.MapPut("/minuteMeals/{id}", WebApiVersion1.PutMinuteMeal).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/minuteMeals/{id}/desc", WebApiVersion1.PatchDescMinuteMeal).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/minuteMeals/{id}/price", WebApiVersion1.PatchPriceMinuteMeal).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
 
-app.MapPost("/menuItems", WebApiVersion1.CreateMenuItem);
+app.MapPost("/menuItems", WebApiVersion1.CreateMenuItem).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
 app.MapGet("/menuItems", WebApiVersion1.GetAllMenuItems);
-app.MapDelete("/menuItems/{id}", WebApiVersion1.DeleteMenuItem);
-app.MapPatch("/menuItems/{id}/date", WebApiVersion1.PatchMenuItemDate);
-app.MapPatch("/menuItems/{id}/portions", WebApiVersion1.PatchMenuItemPortions);
-app.MapPut("/menuItems/{id}", WebApiVersion1.PutMenuItem);
+app.MapDelete("/menuItems/{id}", WebApiVersion1.DeleteMenuItem).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/menuItems/{id}/date", WebApiVersion1.PatchMenuItemDate).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/menuItems/{id}/portions", WebApiVersion1.PatchMenuItemPortions).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPut("/menuItems/{id}", WebApiVersion1.PutMenuItem).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
 app.MapPatch("/menuItems/{id}/portion", WebApiVersion1.DecreaseNumberOfPortions);
-app.MapPatch("/menuItems/{id}/meal", WebApiVersion1.ChangeMenuItemMeal);
+app.MapPatch("/menuItems/{id}/meal", WebApiVersion1.ChangeMenuItemMeal).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
 
 app.MapGet("/orders", WebApiVersion1.GetAllOrders);
 app.MapPost("/orders", WebApiVersion1.CreateOrder);
-app.MapPut("/orders/{id}", WebApiVersion1.PutOrder);
-app.MapPatch("/orders/{id}/status", WebApiVersion1.OrderChangeStatus);
-app.MapPatch("/orders/{id}/menuItem", WebApiVersion1.PatchOrderMenuItem);
-
-
+app.MapPut("/orders/{id}", WebApiVersion1.PutOrder).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
+app.MapPatch("/orders/{id}/status", WebApiVersion1.OrderChangeStatus).RequireAuthorization(pb => pb.RequireRole("cook"));
+app.MapPatch("/orders/{id}/menuItem", WebApiVersion1.PatchOrderMenuItem).RequireAuthorization(pb => pb.RequireRole("meal-admin"));
 
 app.UseHttpsRedirection();
 
