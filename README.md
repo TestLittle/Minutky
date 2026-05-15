@@ -68,7 +68,7 @@ Počet objednávek je ošetřeno ve `WebAPI` díky `[Timestamp]` přidané k pol
 ---
 
 ## 📝 Poznámky k odevzdání (Stav projektu)
-* **Stav:** Projekt splňuje všechny body potřebné k splnění semestrálního odevzdání, kromě implementovaných SSE notifikací.
+* **Stav:** Projekt splňuje všechny body potřebné k splnění semestrálního odevzdání, kromě implementovaných SSE notifikací (bude implementováno před termínem odevzdání projektu).
 * **Souběžnost:** Snížení počtu porcí při objednávce je ošetřeno proti souběžnému přístupu (Concurrency).
 * **Testování:** Automatizované integrační testy (`UTB.Minute.WebApi.Tests`) využívají testovací kontejnerizovanou databázi spravovanou přes .NET Aspire. Testy pokrývají kompletní scénář od vytvoření jídla, přes úpravu, přidání do menu, vytvoření objednávky, změnu stavu až po konečnou deaktivaci a smazání. Zároveň dochází k otestování několika nevalidních vstupů. Testy prochází bez chyb a bez warningů.
 
