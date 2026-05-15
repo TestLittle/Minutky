@@ -74,13 +74,13 @@ else
 @code {
     private List<MenuItemDto>? menuItems;
     private List<MinuteMealDto> activeMeals = new();
-    private List<MinuteMealDto> allMeals = new(); // Přidej tohle
-    // Proměnné pro formulář
+    private List<MinuteMealDto> allMeals = new();
+
     private int selectedMealId;
     private DateTime selectedDate = DateTime.Today;
     private int portions = 50;
 
-    private int? editingId; // null = nové jídlo, číslo = upravujeme
+    private int? editingId;
 
     private void StartEdit(MenuItemDto item)
     {
@@ -103,7 +103,7 @@ else
         else
         {
             await Api.UpdateMenuItemAsync(editingId.Value, request);
-            editingId = null; // Po uložení ukončíme režim úprav
+            editingId = null;
         }
 
         await LoadData();
@@ -118,10 +118,8 @@ else
     {
         menuItems = await Api.GetMenuItemsAsync();
 
-        // 1. Načti úplně všechna jídla (i ta neaktivní) pro tabulku
         allMeals = await Api.GetMealsAsync();
 
-        // 2. Pro výběr (dropdown) si vyfiltruj jen ta aktivní
         activeMeals = allMeals.Where(m => m.IsActive).ToList();
     }
 

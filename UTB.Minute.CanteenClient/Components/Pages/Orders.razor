@@ -25,7 +25,7 @@
     }
     else
     {
-        @foreach (var order in orders.AsEnumerable().Reverse()) @* Nejnovější nahoře *@
+        @foreach (var order in orders.AsEnumerable().Reverse())
         {
             <div class="list-group-item d-flex justify-content-between align-items-center shadow-sm mb-2 rounded">
                 <div>
@@ -34,7 +34,6 @@
                     <small class="text-muted">Jídlo: @GetMealName(order.MenuItemId)</small>
                 </div>
 
-                @* TADY POUŽÍVÁME PŘEKLAD I BARVU *@
                 <span class="badge @GetStatusClass(order.status) p-2">
                     @TranslateStatus(order.status)
                 </span>
@@ -62,14 +61,12 @@
         return meal?.Desc ?? "Neznámé jídlo";
     }
 
-    // --- PŘEVODNÍKY PRO ČESKÉ UI ---
-
     private string TranslateStatus(OrderStatus status) => status switch
     {
         OrderStatus.Preparing => "V přípravě",
         OrderStatus.Ready => "Připraveno k odběru",
         OrderStatus.Cancelled => "Zrušeno",
-        OrderStatus.Completed => "Vyřízeno", // Neutrální slovo
+        OrderStatus.Completed => "Vyřízeno",
         _ => "Neznámý stav"
     };
 

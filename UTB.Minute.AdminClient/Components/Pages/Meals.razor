@@ -34,7 +34,6 @@
         <div class="col-md-3">
             <label class="form-label">Cena</label>
             <div class="input-group">
-                @* type="number" tam necháme kvůli mobilům, ale zbavíme se nuly *@
                 <input type="number" class="form-control" placeholder="0.00" @bind="newMealPrice" step="0.01" />
                 <span class="input-group-text">Kč</span>
             </div>
@@ -46,7 +45,6 @@
             </button>
         </div>
     </div>
-    @* MALÉ CHYBOVÉ HLÁŠENÍ *@
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <div class="alert alert-danger mt-2">@errorMessage</div>
@@ -90,14 +88,11 @@ else
         private string newMealName = "";
         private double? newMealPrice;
         private string errorMessage = "";
-
-        // PŘIDÁME: Sledování, jestli zrovna neupravujeme
         private int? editingMealId;
 
         protected override async Task OnInitializedAsync() => await LoadData();
         private async Task LoadData() => meals = await Api.GetMealsAsync();
 
-        // PŘIDÁME: Načtení jídla do formuláře
         private void StartEdit(MinuteMealDto meal)
         {
             editingMealId = meal.MinuteMealId;
@@ -122,9 +117,8 @@ else
             }
             else
             {
-                // ÚPRAVA STÁVAJÍCÍHO
                 await Api.UpdateMealAsync(editingMealId.Value, request);
-                editingMealId = null; // Resetujeme režim
+                editingMealId = null;
             }
 
             newMealName = "";

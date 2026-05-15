@@ -59,10 +59,7 @@ Architektura striktně odděluje databázové entity od objektů, které se pos�
 **CanteenClient** - K objednávání má přístup každý uživatel (přihlášený i nepříhlášený), ovšem po kliknutí na možnost **Kuchařka** dojde k automatickému přesměrování na přihlašovací formulář, takže zde je to vyřešené pomocí `[Authorize(Roles = "cook")]` na samotné stránce společně s `<AuthorizeView Roles="cook">`, kde je přidána funcionalita pro odhlášení přihlášeného uživatele.
 **AdminClient** - Zde je zabezpečená veškerá aplikace pomocí `app.MapRazorComponents<App>().RequireAuthorization(pb => pb.RequireRole("meal-admin")).AddInteractiveServerRenderMode();`
 
-### 2. SSE Notifikace
--
-
-### 3. Business pravidla
+### 2. Business pravidla
 Počet objednávek je ošetřeno ve `WebAPI` díky `[Timestamp]` přidané k položce `MenuItem`.
 
 ---
