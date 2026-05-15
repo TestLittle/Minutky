@@ -1,4 +1,5 @@
 using Duende.AccessTokenManagement.OpenIdConnect;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
@@ -28,7 +29,7 @@ builder.Services.AddAuthentication(options =>
   options =>
   {
       options.ClientId = "utb-minute-canteenclient";
-      options.ClientSecret = "..."; // jen dev
+      options.ClientSecret = "EYMr3eh2Rf6aQNl4HQBYeGoI3nqQzViC"; // jen dev
       options.ResponseType = OpenIdConnectResponseType.Code;
       options.Scope.Add("openid");
       options.Scope.Add("offline_access");
@@ -53,6 +54,21 @@ builder.Services.AddUserAccessTokenHttpClient<CanteenApiClient>(
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
+
+app.MapPost("/logout", async (HttpContext ctx) =>
+{
+    string? idToken = await ctx.GetTokenAsync("id_token");
+
+    await ctx.RevokeRefreshTokenAsync();
+
+    await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    await ctx.SignOutAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
+    {
+        RedirectUri = "/",
+        Parameters = { { "id_token_hint", idToken ?? string.Empty } }
+    });
+});
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

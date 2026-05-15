@@ -12,6 +12,19 @@
 
 <PageTitle>Pohled Kuchařky</PageTitle>
 
+<AuthorizeView Roles="cook">
+    <Authorized>
+        <p>Welcome back @context.User.Identity?.Name !</p>
+
+        <form action="logout" method="post">
+            <AntiforgeryToken />
+            <button type="submit" class="nav-link btn btn-link">Logout</button>
+        </form>
+
+    </Authorized>
+</AuthorizeView>
+
+
 @if (orders == null)
 {
     <div class="text-center">
@@ -29,7 +42,6 @@ else
                     <div class="card-body">
                         <h5 class="card-title">Objednávka #@order.OrderId</h5>
 
-                        @* TADY POUŽIJEME PŘEVODNÍK *@
                         <p class="card-text">Stav: <span class="badge @GetBadgeClass(order.status)">@TranslateStatus(order.status)</span></p>
 
                         <div class="d-grid gap-2 mt-3">
@@ -70,8 +82,6 @@ else
         await Api.UpdateOrderStatusAsync(id, status);
         await LoadOrders();
     }
-
-    // --- PŘEVODNÍKY PRO UI ---
 
     private string TranslateStatus(OrderStatus status) => status switch
     {

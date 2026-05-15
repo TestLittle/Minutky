@@ -1,0 +1,50 @@
+{
+  "realm" : "utb-minute",
+  "users" : [ {
+    "id" : "be10bccb-d1be-4bc4-bf51-d291e64660c5",
+    "username" : "jmeal",
+    "firstName" : "Jan",
+    "lastName" : "Meal",
+    "email" : "j_meal@utb.cz",
+    "emailVerified" : true,
+    "enabled" : true,
+    "createdTimestamp" : 1778834677955,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "c1c96f0b-045a-4125-aeb2-53bbeb7b51ac",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1778834696752,
+      "secretData" : "{\"value\":\"eJ46b/LrSRH7UCMOSmw1THNtCrkYkr5WBhFMdKUT8Fs=\",\"salt\":\"UMN9A0oE5IlVNUiXEKBxxA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-utb-minute", "meal-admin" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "d3a09989-5e92-4754-afb7-8615523ceae2",
+    "username" : "pavel",
+    "firstName" : "Pavel",
+    "lastName" : "Test",
+    "email" : "pavel@utb.cz",
+    "emailVerified" : true,
+    "enabled" : true,
+    "createdTimestamp" : 1777886588053,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "40741cb7-3592-42b6-9155-b6beabb63ba6",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1777886691578,
+      "secretData" : "{\"value\":\"lvQ+P1hMbTCviT4hWOCSFSM0+k04h9XeeDiubRleHik=\",\"salt\":\"m15xD97vL6MM8Onl2vFi4Q==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-utb-minute", "cook" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

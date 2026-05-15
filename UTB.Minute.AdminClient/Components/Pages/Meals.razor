@@ -1,5 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using UTB.Minute.AdminClient.Services
 @using UTB.Minute.Contracts
 @inject MinuteApiClient Api
@@ -7,6 +9,19 @@
 <PageTitle>Správa jídel</PageTitle>
 
 <h1>Správa jídel v menze</h1>
+
+<AuthorizeView Roles="meal-admin">
+    <Authorized>
+        <p>Welcome back @context.User.Identity?.Name !</p>
+
+        <form action="logout" method="post">
+            <AntiforgeryToken />
+            <button type="submit" class="nav-link btn btn-link">Logout</button>
+        </form>
+
+    </Authorized>
+</AuthorizeView>
+
 
 <div class="card p-3 my-4 shadow-sm">
     <h4>Přidat nové jídlo</h4>
@@ -60,10 +75,8 @@ else
                     <td>@meal.Price Kč</td>
                     <td>@(meal.IsActive ? "✅" : "❌")</td>
                     <td>
-                        <td>
-                            <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleMeal(meal)">Přepnout stav</button>
-                            <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(meal)">Upravit</button>
-                        </td>
+                        <button class="btn btn-sm btn-outline-secondary" @onclick="() => ToggleMeal(meal)">Přepnout stav</button>
+                        <button class="btn btn-sm btn-outline-primary" @onclick="() => StartEdit(meal)">Upravit</button>
                     </td>
                 </tr>
             }

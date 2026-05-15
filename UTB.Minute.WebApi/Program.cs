@@ -12,10 +12,10 @@ builder.AddSqlServerDbContext<MinuteContext>("database");
 builder.Services.AddAuthentication()
     .AddKeycloakJwtBearer(
         serviceName: "keycloak",
-        realm: "utb-school",
+        realm: "utb-minute",
         options =>
         {
-            options.Audience = "utb-school-webapi";
+            options.Audience = "utb-minute-webapi";
             options.RequireHttpsMetadata = false; // jen pro dev
         }
     );

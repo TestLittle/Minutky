@@ -30,8 +30,8 @@ namespace UTB.Minute.WebApi.Tests
             {
                 { "grant_type", "password" },
                 { "client_id", "utb-minute-tests" },
-                { "username", "karel" },
-                { "password", "karel" },
+                { "username", "pavel" },
+                { "password", "pavel" },
                 { "scope", "openid" }
             }));
 

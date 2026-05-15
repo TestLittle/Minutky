@@ -1,16 +1,13 @@
-﻿@page "/my-orders"
+﻿@page "/orders"
 @using UTB.Minute.CanteenClient.Services
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Components.Authorization
 @using UTB.Minute.Contracts
 @using UTB.Minute.Db
-@attribute [Authorize(Roles = "student")]
 @inject CanteenApiClient Api
 @rendermode InteractiveServer
 
-<h3>Moje objednávky 📝</h3>
+<h3>Objednávky 📝</h3>
 
-<PageTitle>Moje objednávky</PageTitle>
+<PageTitle>Objednávky</PageTitle>
 
 <div class="list-group mt-3">
     @if (orders == null)

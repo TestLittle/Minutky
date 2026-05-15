@@ -30,7 +30,7 @@ builder.Services.AddAuthentication(options =>
   options =>
   {
       options.ClientId = "utb-minute-adminclient";
-      options.ClientSecret = "..."; // dev only
+      options.ClientSecret = "HjMp2G13Xy3eE8novdclqB45RSzIdfpP"; // dev only
       options.ResponseType = OpenIdConnectResponseType.Code;
       options.Scope.Add("openid");
       options.Scope.Add("offline_access");
@@ -54,22 +54,6 @@ builder.Services.AddUserAccessTokenHttpClient<MinuteApiClient>(
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-
-app.MapGet("/login", async (HttpContext ctx, string? returnUrl) =>
-{
-    string redirectUri = "/";
-
-    if (!string.IsNullOrWhiteSpace(returnUrl) && Uri.IsWellFormedUriString(returnUrl, UriKind.Relative))
-    {
-        redirectUri = returnUrl;
-    }
-
-    await ctx.ChallengeAsync(OpenIdConnectDefaults.AuthenticationScheme, new AuthenticationProperties
-    {
-        RedirectUri = redirectUri,
-        IsPersistent = false
-    });
-});
 
 app.MapPost("/logout", async (HttpContext ctx) =>
 {

@@ -23,4 +23,17 @@
     <ProjectReference Include="..\UTB.Minute.WebApi\UTB.Minute.WebApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Realm\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Realm\utb-minute-realm.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Realm\utb-minute-users-0.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
